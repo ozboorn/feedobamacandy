@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obama Eats Candy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        h1 {
+            color: #0066cc;
+            margin-bottom: 20px;
+        }
+        
+        .container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        
+        #obama {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
+        }
+        
+        #obama.eating {
+            animation: eatAnimation 0.5s ease;
+        }
+        
+        @keyframes eatAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .candy {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            opacity: 1;
+            transition: all 0.5s ease;
+            border-radius: 50%;
+        }
+        
+        .speech-bubble {
+            position: absolute;
+            background-color: white;
+            border-radius: 15px;
+            padding: 10px 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .speech-bubble.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .instructions {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .counter {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF5722;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Click on Obama to Feed Him Candy!</h1>
+    
+    <div class="container">
+        <!-- REPLACE IMAGE HERE - Replace the "src" attribute below with your Obama image URL -->
+        <img id="obama" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdvGkUdhV1zBHRWAlfvfsv0tOqCoQL-Rmjtg&s" alt="Barack Obama">
+        <!-- For example: <img id="obama" src="your-obama-image-url.jpg" alt="Barack Obama"> -->
+    </div>
+    
+    <div class="counter">Candies eaten: <span id="count">0</span></div>
+    
+    <div class="instructions">
+        <p>Click on Barack Obama's face to feed him candy!</p>
+    </div>
+
+    <script>
+        // Wait for everything to load
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.container');
+            const obamaImg = document.getElementById('obama');
+            let count = 0;
+            const countDisplay = document.getElementById('count');
+            
+            // Candy types with different colors
+            const candyTypes = [
+                { color: '#FF5252', name: 'cherry' },
+                { color: '#FFEB3B', name: 'lemon' },
+                { color: '#4CAF50', name: 'lime' },
+                { color: '#2196F3', name: 'blueberry' },
+                { color: '#9C27B0', name: 'grape' }
+            ];
+            
+            // Obama's mouth position (approximate percentage of the image)
+            const mouthX = 50; // % from left
+            const mouthY = 65; // % from top
+            
+            // Speech bubble messages
+            const speechMessages = [
+                "Mmm, delicious!",
+                "Thanks for the candy!",
+                "Sweet!",
+                "That's my favorite!",
+                "Yes, we candy!",
+                "Change never tasted so good!",
+                "That's what I'm talking about!",
+                "Michelle would approve!",
+                "That's some good candy right there!"
+            ];
+            
+            // Function to show a speech bubble with random message
+            function showSpeechBubble() {
+                // Create bubble if it doesn't exist
+                let bubble = document.querySelector('.speech-bubble');
+                if (!bubble) {
+                    bubble = document.createElement('div');
+                    bubble.className = 'speech-bubble';
+                    container.appendChild(bubble);
+                }
+                
+                // Position bubble
+                bubble.style.right = '20px';
+                bubble.style.top = '50px';
+                
+                // Set random message
+                const randomMessage = speechMessages[Math.floor(Math.random() * speechMessages.length)];
+                bubble.textContent = randomMessage;
+                
+                // Show bubble
+                bubble.classList.add('show');
+                
+                // Hide bubble after delay
+                setTimeout(() => {
+                    bubble.classList.remove('show');
+                }, 2000);
+            }
+            
+            obamaImg.addEventListener('click', function(e) {
+                // Create candy at click position
+                const candy = document.createElement('div');
+                candy.className = 'candy';
+                
+                // Get random candy type
+                const randomCandy = candyTypes[Math.floor(Math.random() * candyTypes.length)];
+                
+                // Position candy at click
+                const rect = container.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                candy.style.left = (x - 30) + 'px';
+                candy.style.top = (y - 30) + 'px';
+                candy.style.backgroundColor = randomCandy.color;
+                
+                container.appendChild(candy);
+                
+                // Calculate mouth position in pixels
+                const mouthPosX = container.offsetWidth * (mouthX / 100);
+                const mouthPosY = container.offsetHeight * (mouthY / 100);
+                
+                // Animate candy to mouth
+                setTimeout(() => {
+                    candy.style.left = `${mouthPosX - 30}px`;
+                    candy.style.top = `${mouthPosY - 30}px`;
+                    candy.style.width = '10px';
+                    candy.style.height = '10px';
+                    
+                    // Add eating animation when candy reaches mouth
+                    setTimeout(() => {
+                        try {
+                            // Remove candy and update counter
+                            candy.remove();
+                            count++;
+                            countDisplay.textContent = count;
+                            
+                            // Add animation to Obama
+                            obamaImg.classList.add('eating');
+                            setTimeout(() => {
+                                obamaImg.classList.remove('eating');
+                            }, 500);
+                            
+                            // Occasionally show speech bubble (1 in 3 chance)
+                            if (Math.random() < 0.4) {
+                                setTimeout(() => {
+                                    // Show speech bubble with random message
+                                    showSpeechBubble();
+                                }, 300);
+                            }
+                        } catch (e) {
+                            console.log("Error in candy animation:", e);
+                        }
+                    }, 500);
+                }, 10);
+            });
+        });
+    </script>
+</body>
+</html>
